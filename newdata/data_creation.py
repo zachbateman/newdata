@@ -78,7 +78,10 @@ class DataCreator():
             fuzz_factor = random.random()
             param_func = rand_func()
             for index, d in enumerate(data):
-                d[param] = fuzzify(param_func(d['Target']), fuzz_factor)
+                value = fuzzify(param_func(d['Target']), fuzz_factor)
+                if isinstance(value, complex):
+                    value = value.real
+                d[param] = value
 
         return data
 
