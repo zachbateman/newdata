@@ -8,7 +8,7 @@ from typing import List, Dict
 
 
 param_funcs = [
-    lambda x: math.factorial(x // 1),
+    lambda x: math.factorial(abs(x) // 1),
     lambda x: math.frexp(x)[0],
     lambda x: math.log(abs(x)),
     lambda x: math.log(abs(x), 5),
