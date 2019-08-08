@@ -9,11 +9,11 @@ from typing import List, Dict
 
 
 param_funcs = [
-    lambda x: math.factorial(abs(x) // 1),
+    lambda x: math.factorial(abs(x) ** 0.1 // 1),
     lambda x: math.frexp(x)[0],
-    lambda x: math.log(abs(x)),
-    lambda x: math.log(abs(x), 5),
-    lambda x: math.log(abs(x), 10),
+    lambda x: math.log(abs(x) + 0.1),
+    lambda x: math.log(abs(x) + 0.1, 5),
+    lambda x: math.log(abs(x) + 0.1, 10),
     lambda x: math.pow(x, 1),
     lambda x: math.pow(x, 2),
     lambda x: math.pow(x, 3),
@@ -24,10 +24,10 @@ param_funcs = [
     lambda x: math.tan(x),
     lambda x: math.erf(x),
     lambda x: math.erfc(x),
-    lambda x: math.gamma(x),
-    lambda x: math.lgamma(x),
+    lambda x: math.gamma((abs(x) + 0.1) ** 0.1),
+    lambda x: math.lgamma((abs(x) + 0.1) ** 0.1),
     lambda x: x + (random.random() - 0.5) * x,
-    lambda x: 1 / x,
+    lambda x: 1 / x if x != 0 else 1 / 0.00001,
     lambda x: random.random() * 5 * x,
     lambda x: x ** random.random(),
     lambda x: 0.25 * x,
@@ -45,7 +45,7 @@ def rand_func():
     else:  # combine two functions to create a new function
         f1 = random.choice(param_funcs)
         f2 = random.choice(param_funcs)
-        return lambda x: f2(f1(x))
+        return lambda x: f2(f1(x)) if not isinstance(f1(x), complex) else f2(f1(x).real)
 
 
 def fuzzify(x, factor: float=0.5) -> float:
@@ -53,7 +53,15 @@ def fuzzify(x, factor: float=0.5) -> float:
     Randomly change given number a bit to add noise/fuzz to data.
     factor is float [0 < factor < 1] that adjusts how much fuzz.
     '''
-    return x * (random.random() + 0.5) ** (factor + 0.1)
+    if isinstance(x, complex):
+        x = x.real
+    try:
+        return x * (random.random() + 0.5) ** (factor + 0.1)
+    except OverflowError:
+        if x > 0:
+            return 10 ** 10
+        else:
+            return -10 ** 10
 
 
 class DataCreator():
@@ -71,7 +79,8 @@ class DataCreator():
         min_initial_target = -random.random() * 10
         max_initial_target = random.random() * 10
         initial_values = [random.uniform(min_initial_target, max_initial_target) for _ in range(num_samples)]
-        target_values = [fuzzify(target_func(x)) for x in initial_values]
+        target_values = [fuzzify(target_func(x) if not isinstance(target_func(x), complex) else target_func(x).real)
+                         for x in initial_values]
         data = [{'Target': x} for x in target_values]
 
         # create associated parameters
