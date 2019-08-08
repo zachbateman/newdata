@@ -2,6 +2,7 @@
 Python module for creating synthetic data sets.
 '''
 import os
+import csv
 import math
 import random
 from typing import List, Dict
@@ -33,6 +34,7 @@ param_funcs = [
     lambda x: 0.5 * x,
     lambda x: 0.75 * x,
     lambda x: random.random(),
+    lambda x: x ** 2 - x
     ]
 negative_param_funcs = [lambda x: -f(x) for f in param_funcs]
 param_funcs = param_funcs + negative_param_funcs
@@ -103,3 +105,14 @@ class DataCreator():
         with open(os.path.join('.', module_name), 'w') as f:
             f.write(s)
         print(f'New synthetic data saved to {module_name}!')
+
+
+    def save_data_as_csv(self, csv_filename='newdata_set.csv') -> None:
+        '''
+        Output a CSV file with the synthetic data set.
+        '''
+        with open(csv_filename, 'w', newline='') as f:
+            keys = self.data[0].keys()
+            dict_writer = csv.DictWriter(f, keys, delimiter=',')
+            dict_writer.writeheader()
+            dict_writer.writerows(self.data)

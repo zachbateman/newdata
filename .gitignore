@@ -5,3 +5,4 @@ build/
 dist/
 newdata.egg-info/
 newdata_set.py
+*.csv
