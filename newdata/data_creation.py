@@ -48,7 +48,7 @@ def rand_func():
 
 def fuzzify(x, factor: float=0.5) -> float:
     '''
-    Randomly change given number a bit to add noize/fuzz to data.
+    Randomly change given number a bit to add noise/fuzz to data.
     factor is float [0 < factor < 1] that adjusts how much fuzz.
     '''
     return x * (random.random() + 0.5) ** (factor + 0.1)
